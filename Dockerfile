@@ -17,7 +17,6 @@ RUN npm install
 
 # Copy source code
 COPY src ./src
-COPY key.json ./key.json
 
 # Build TypeScript code
 RUN npm run build

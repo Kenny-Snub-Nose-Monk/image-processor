@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 env:
-  PROJECT_ID: your-project-id
+  PROJECT_ID: huashui-ai
   REGION: asia-east1
   SERVICE: image-processor
 
