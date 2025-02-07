@@ -12,6 +12,10 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     steps:
       - uses: actions/checkout@v3
 
@@ -25,15 +29,19 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v1'
         with:
           project_id: ${{ env.PROJECT_ID }}
+          install_components: 'beta'
 
       - name: 'Configure Docker'
-        run: gcloud auth configure-docker
+        run: gcloud auth configure-docker asia-east1-docker.pkg.dev
 
       - name: 'Build and Deploy'
         run: |
-          gcloud builds submit --tag gcr.io/$PROJECT_ID/$SERVICE
+          gcloud builds submit --tag gcr.io/$PROJECT_ID/$SERVICE \
+            --timeout=1800s \
+            --quiet
           gcloud run deploy $SERVICE \
             --image gcr.io/$PROJECT_ID/$SERVICE \
             --platform managed \
             --region $REGION \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --quiet
