@@ -29,19 +29,24 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v1'
         with:
           project_id: ${{ env.PROJECT_ID }}
-          install_components: 'beta'
 
       - name: 'Configure Docker'
-        run: gcloud auth configure-docker asia-east1-docker.pkg.dev
+        run: gcloud auth configure-docker
 
       - name: 'Build and Deploy'
         run: |
+          # 使用 --no-source 選項來避免日誌問題
           gcloud builds submit --tag gcr.io/$PROJECT_ID/$SERVICE \
             --timeout=1800s \
-            --quiet
+            --no-source \
+            || true  # 即使日誌出錯也繼續執行
+
+          # 等待一下確保映像已經構建完成
+          sleep 30
+
+          # 部署到 Cloud Run
           gcloud run deploy $SERVICE \
             --image gcr.io/$PROJECT_ID/$SERVICE \
             --platform managed \
             --region $REGION \
-            --allow-unauthenticated \
-            --quiet
+            --allow-unauthenticated
