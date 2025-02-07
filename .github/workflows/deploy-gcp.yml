@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 env:
-  PROJECT_ID: huashui-ai
+  PROJECT_ID: huashui-ai-450006
   REGION: asia-east1
   SERVICE: image-processor
 
@@ -15,13 +15,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
         with:
           project_id: ${{ env.PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Build and Deploy
+      - name: 'Configure Docker'
+        run: gcloud auth configure-docker
+
+      - name: 'Build and Deploy'
         run: |
           gcloud builds submit --tag gcr.io/$PROJECT_ID/$SERVICE
           gcloud run deploy $SERVICE \
