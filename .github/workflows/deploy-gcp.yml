@@ -35,18 +35,15 @@ jobs:
 
       - name: 'Build and Deploy'
         run: |
-          # 使用 --no-source 選項來避免日誌問題
-          gcloud builds submit --tag gcr.io/$PROJECT_ID/$SERVICE \
-            --timeout=1800s \
-            --no-source \
-            || true  # 即使日誌出錯也繼續執行
+          # Build the Docker image
+          docker build -t gcr.io/$PROJECT_ID/$SERVICE .
+          # Push to Container Registry
+          docker push gcr.io/$PROJECT_ID/$SERVICE
 
-          # 等待一下確保映像已經構建完成
-          sleep 30
-
-          # 部署到 Cloud Run
+          # Deploy to Cloud Run
           gcloud run deploy $SERVICE \
             --image gcr.io/$PROJECT_ID/$SERVICE \
             --platform managed \
             --region $REGION \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --set-env-vars="GOOGLE_CLOUD_BUCKET_NAME=${{ secrets.GOOGLE_CLOUD_BUCKET_NAME }}"
