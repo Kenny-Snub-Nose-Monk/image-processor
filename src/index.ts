@@ -135,9 +135,6 @@ app.post('/compress', upload.single('image'), async (req, res) => {
       },
     });
 
-    // 設定檔案為公開可讀
-    await file.makePublic();
-
     // 使用 file.publicUrl() 方法獲取公開 URL
     const publicUrl = file.publicUrl();
 
