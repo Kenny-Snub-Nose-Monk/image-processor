@@ -33,16 +33,33 @@ app.post('/compress', upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'No image file provided' });
     }
 
+    // 記錄檔案資訊以便除錯
+    console.log('Uploaded file info:', {
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+    });
+
     // 檢查檔案是否為支援的圖片類型
     const supportedTypes = [
       'image/jpeg',
       'image/png',
       'image/gif',
       'image/webp',
+      'image/jpg',
     ];
-    if (!supportedTypes.includes(req.file.mimetype)) {
+
+    const originalName = req.file.originalname || '';
+    const fileExt = originalName.split('.').pop()?.toLowerCase() || '';
+
+    // 檢查 MIME 類型或副檔名
+    const isSupported =
+      supportedTypes.includes(req.file.mimetype) ||
+      ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExt);
+
+    if (!isSupported) {
       return res.status(400).json({
-        error: 'Unsupported image type. Supported types: JPEG, PNG, GIF, WebP',
+        error: `Unsupported image type: ${req.file.mimetype} (${fileExt}). Supported types: JPEG, PNG, GIF, WebP`,
       });
     }
 
