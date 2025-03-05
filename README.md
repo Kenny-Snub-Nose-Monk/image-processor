@@ -1,4 +1,4 @@
-# Huashui Image Processor
+# Journal Easy Image Processor
 
 圖片處理微服務，提供圖片壓縮和上傳到 Google Cloud Storage 的功能。
 
